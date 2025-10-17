@@ -1,0 +1,3 @@
+//adjustig rules is required in firestore
+
+//adjusting routing while deplying for auth0, for local only 5173

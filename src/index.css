@@ -1,0 +1,19 @@
+@import "tailwindcss";
+
+body {
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+/* debug.css */
+/* * {
+  outline: 1px solid red;
+} */
+@font-face {
+  font-family: "MyCustomFont";
+  src: url("/fonts/Transcity.otf") format("opentype");
+  font-weight: normal;
+  font-style: normal;
+}
