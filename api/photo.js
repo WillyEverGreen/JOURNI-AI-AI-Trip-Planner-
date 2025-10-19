@@ -1,5 +1,7 @@
-// Vercel Serverless Function for Google Maps Photo Proxy
-export default async function handler(req, res) {
+// Vercel Serverless Function for Google Maps Photo Proxy// Stub file: API handled by Express in server.js for local development.
+
+export default async function handler(req, res) {// ...existing code...
+
   // Enable CORS
   res.setHeader("Access-Control-Allow-Credentials", "true");
   res.setHeader("Access-Control-Allow-Origin", "*");

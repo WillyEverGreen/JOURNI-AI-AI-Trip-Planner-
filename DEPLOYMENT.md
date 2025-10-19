@@ -1,6 +1,4 @@
-# 🚀 Vercel Deployment Guide for JOURNI AI
-
-This guide will help you deploy JOURNI AI Trip Planner to Vercel.
+// This project is now local-only. No Vercel or serverless deployment is supported or documented. Use `npm run dev` for local development.
 
 ## Prerequisites
 

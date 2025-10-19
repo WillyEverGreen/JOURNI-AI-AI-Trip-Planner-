@@ -291,13 +291,13 @@ Modify `src/constants/options.jsx` to add or edit travel preferences.
 
 ## 🚢 Deployment
 
-### Build for Production
+### Build for Production (Local Only)
 
 ```bash
 npm run build
 ```
 
-This creates an optimized production build in the `dist/` folder.
+This creates an optimized production build in the `dist/` folder. You can serve it locally or deploy to any static host with your own Node.js backend for API proxying. Vercel/serverless is not required or supported in this setup.
 
 ### Deployment Platforms
 

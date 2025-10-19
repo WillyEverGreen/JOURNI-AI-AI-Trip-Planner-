@@ -1,5 +1,7 @@
-// Vercel Serverless Function for Google Maps Place Search
-export default async function handler(req, res) {
+// Vercel Serverless Function for Google Maps Place Search// Stub file: API handled by Express in server.js for local development.
+
+export default async function handler(req, res) {// ...existing code...
+
   // Enable CORS
   res.setHeader("Access-Control-Allow-Credentials", "true");
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -43,7 +45,6 @@ export default async function handler(req, res) {
 
     if (place.photos && place.photos.length > 0) {
       const ref = place.photos[0].photo_reference;
-      // Provide a proxied endpoint so client doesn't see the API key
       return res.json({
         photoUrl: `/api/photo?ref=${encodeURIComponent(ref)}`,
       });
