@@ -288,9 +288,6 @@ Modify `src/constants/options.jsx` to add or edit travel preferences.
 - ✅ API keys are never exposed to the client (server-side proxy for Google Maps)
 - ✅ Auth0 handles secure authentication
 - ✅ Firebase security rules should be configured for production
-- ✅ CORS is properly configured in the Express server
-
----
 
 ## 🚢 Deployment
 
@@ -306,13 +303,63 @@ This creates an optimized production build in the `dist/` folder.
 
 This app can be deployed to:
 
-- **Vercel** (Recommended for Vite apps)
-- **Netlify**
-- **Firebase Hosting**
-- **AWS Amplify**
-- **Render**
-
 **Note:** Make sure to set up environment variables in your deployment platform and deploy both the frontend and the Express proxy server.
+
+- ✅ CORS is properly configured in the Express server
+
+---
+
+## 🚢 Deployment
+
+### Deploy to Vercel (Recommended)
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/WillyEverGreen/JOURNI-AI-AI-Trip-Planner-)
+
+**Quick Deploy:**
+
+1. Click the button above
+2. Connect your GitHub account
+3. Add environment variables (see below)
+4. Deploy!
+
+This app is **optimized for Vercel** with:
+
+- ✅ Serverless API functions in `/api` directory
+- ✅ Automatic static site deployment
+- ✅ Zero configuration needed
+- ✅ Free tier available
+
+### Environment Variables for Vercel
+
+Add these in **Vercel Dashboard** → **Settings** → **Environment Variables**:
+
+```env
+VITE_GEMINI_API_KEY=your_gemini_api_key
+VITE_GOOGLE_MAPS_API_KEY=your_google_maps_client_key
+GOOGLE_MAPS_API_KEY=your_google_maps_server_key
+VITE_AUTH0_DOMAIN=your_auth0_domain
+VITE_AUTH0_CLIENT_ID=your_auth0_client_id
+VITE_AUTH0_REDIRECT_URI=https://your-app.vercel.app/create-trip
+VITE_FIREBASE_API_KEY=your_firebase_api_key
+VITE_FIREBASE_AUTH_DOMAIN=your_firebase_auth_domain
+VITE_FIREBASE_PROJECT_ID=your_firebase_project_id
+VITE_FIREBASE_STORAGE_BUCKET=your_firebase_storage_bucket
+VITE_FIREBASE_MESSAGING_SENDER_ID=your_firebase_messaging_sender_id
+VITE_FIREBASE_APP_ID=your_firebase_app_id
+```
+
+**📘 Full Deployment Guide:** See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed instructions
+
+### Other Platforms
+
+This app can also be deployed to:
+
+- **Netlify** - Requires Netlify Functions setup
+- **Firebase Hosting** - Requires Cloud Functions for API
+- **AWS Amplify** - Requires Lambda functions for API
+- **Render** - Requires separate API service
+
+**Note:** Vercel is recommended as it requires zero configuration and includes serverless functions out of the box.
 
 ---
 
