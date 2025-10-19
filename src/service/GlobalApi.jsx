@@ -3,10 +3,11 @@
 export async function getPlacePhotoByText(text) {
   if (!text) return null;
   try {
-    // Use explicit backend base in dev to avoid proxy issues.
-    // In production the API is expected to be same-origin, so base will be empty string.
+    // Prefer relative base in dev to leverage Vite proxy (see vite.config.js)
+    // If VITE_API_BASE is set, it will override and allow custom backends.
+    // In production, API is expected to be same-origin.
     const devBase = import.meta.env.DEV
-      ? import.meta.env.VITE_API_BASE || "http://localhost:3001"
+      ? import.meta.env.VITE_API_BASE ?? ""
       : "";
     const url = `${devBase}/api/place?text=${encodeURIComponent(text)}`;
     const resp = await fetch(url);

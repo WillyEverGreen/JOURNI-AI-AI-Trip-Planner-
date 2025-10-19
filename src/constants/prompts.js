@@ -39,7 +39,7 @@ Please provide the output in JSON format only following this structure:
         {
           "name": "Hotel name",
           "rating": "Hotel rating",
-          "priceRange": "Approximate price per night",
+          "priceRange": "Approximate price per night in Indian Rupees (₹)",
           "address": "Hotel address",
           "imageUrl": "Hotel image URL"
         }
@@ -56,5 +56,6 @@ Rules:
 4. Include 3 hotel options, 3 restaurants, and 3 activities per day if possible
 5. Output ONLY valid JSON without any extra text or markdown formatting
 6. Do not wrap the response in markdown code blocks
+7. All hotel prices MUST be in Indian Rupees (₹) with proper formatting (e.g., "₹3,000 - ₹5,000 per night")
 .
 `;

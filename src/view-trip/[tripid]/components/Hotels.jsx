@@ -51,7 +51,7 @@ function Hotels({ trip }) {
                 <h2 className="text-[#2b2d42] text-xs ">📍 {hotel?.address}</h2>
                 <div className="flex justify-between">
                   <h2 className="text-[#2b2d42] text-sm">
-                    💰{hotel?.priceRange}
+                    ₹ {hotel?.priceRange}
                   </h2>
                   <h2 className="text-[#2b2d42] text-sm">⭐{hotel.rating}</h2>
                 </div>

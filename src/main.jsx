@@ -8,19 +8,44 @@ import CreateTrip from "./create-trip";
 import Header from "./components/custom/header";
 import { Auth0Provider } from "@auth0/auth0-react";
 import Viewtrip from "./view-trip/[tripid]";
+import MyTrips from "./my-trips/MyTrips";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <App></App>,
+    element: (
+      <>
+        <Header /> {/* ✅ inside router */}
+        <App />
+      </>
+    ),
   },
   {
     path: "/create-trip",
-    element: <CreateTrip></CreateTrip>,
+    element: (
+      <>
+        <Header />
+        <CreateTrip />
+      </>
+    ),
   },
   {
     path: "/view-trip/:tripid",
-    element: <Viewtrip></Viewtrip>,
+    element: (
+      <>
+        <Header />
+        <Viewtrip />
+      </>
+    ),
+  },
+  {
+    path: "/my-trips",
+    element: (
+      <>
+        <Header />
+        <MyTrips />
+      </>
+    ),
   },
 ]);
 createRoot(document.getElementById("root")).render(
@@ -33,7 +58,6 @@ createRoot(document.getElementById("root")).render(
     cacheLocation="localstorage"
   >
     <StrictMode>
-      <Header></Header>
       <RouterProvider router={router} />
     </StrictMode>
   </Auth0Provider>

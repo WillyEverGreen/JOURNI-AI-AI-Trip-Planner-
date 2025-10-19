@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="600" viewBox="0 0 1600 600" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fff5f6"/>
+      <stop offset="50%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#f6f7fb"/>
+    </linearGradient>
+    <radialGradient id="glowR" cx="0.2" cy="0.2" r="0.5">
+      <stop offset="0%" stop-color="#e63946" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#e63946" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glowB" cx="0.8" cy="0.8" r="0.6">
+      <stop offset="0%" stop-color="#2b2d42" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#2b2d42" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="6"/>
+    </filter>
+    <pattern id="grain" patternUnits="userSpaceOnUse" width="100" height="100">
+      <rect width="100" height="100" fill="transparent"/>
+      <g opacity="0.06">
+        <circle cx="5" cy="7" r="1" fill="#000"/>
+        <circle cx="25" cy="35" r="1" fill="#000"/>
+        <circle cx="70" cy="60" r="1" fill="#000"/>
+        <circle cx="90" cy="20" r="1" fill="#000"/>
+        <circle cx="45" cy="80" r="1" fill="#000"/>
+        <circle cx="15" cy="55" r="1" fill="#000"/>
+        <circle cx="60" cy="10" r="1" fill="#000"/>
+      </g>
+    </pattern>
+    <mask id="fade">
+      <linearGradient id="fadeGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="white"/>
+        <stop offset="100%" stop-color="black"/>
+      </linearGradient>
+      <rect width="1600" height="600" fill="url(#fadeGrad)"/>
+    </mask>
+    <style>
+      .route { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+      .route.red { stroke: #e63946; }
+      .route.blue { stroke: #2b2d42; }
+      .topo { fill: none; stroke: #2b2d42; stroke-opacity: 0.10; }
+      .node { fill: white; stroke-width: 2; }
+      .node.red { stroke: #e63946; }
+      .node.blue { stroke: #2b2d42; }
+      .dash { stroke-dasharray: 8 10; }
+    </style>
+  </defs>
+
+  <!-- Background gradient -->
+  <rect width="1600" height="600" fill="url(#bg)"/>
+
+  <!-- Soft glows -->
+  <circle cx="260" cy="140" r="220" fill="url(#glowR)" filter="url(#soft)"/>
+  <circle cx="1340" cy="480" r="260" fill="url(#glowB)" filter="url(#soft)"/>
+
+  <!-- Subtle topographic lines -->
+  <g mask="url(#fade)">
+    <path class="topo" stroke-width="1.2" d="M-50 120 C 200 80, 350 160, 520 130 S 880 70, 1060 120 1360 210, 1660 140"/>
+    <path class="topo" stroke-width="1.2" d="M-50 220 C 220 200, 360 240, 520 210 S 900 160, 1080 220 1380 300, 1660 250"/>
+    <path class="topo" stroke-width="1.2" d="M-50 320 C 240 300, 380 340, 560 320 S 920 300, 1110 330 1400 380, 1660 360"/>
+    <path class="topo" stroke-width="1.2" d="M-50 430 C 220 420, 420 450, 620 430 S 980 410, 1180 450 1460 500, 1660 490"/>
+  </g>
+
+  <!-- Routes -->
+  <g>
+    <path class="route red dash" stroke-width="2.5" d="M120 480 C 360 380, 520 380, 700 300 S 980 160, 1380 180"/>
+    <path class="route blue dash" stroke-width="2.5" d="M260 160 C 420 180, 560 240, 760 240 S 1060 220, 1320 300"/>
+    <path class="route blue" stroke-opacity="0.25" stroke-width="8" d="M180 520 C 420 430, 620 360, 960 360 S 1240 420, 1500 390"/>
+  </g>
+
+  <!-- Nodes -->
+  <g>
+    <circle class="node red" cx="120" cy="480" r="6" stroke="#e63946"/>
+    <circle class="node red" cx="700" cy="300" r="6" stroke="#e63946"/>
+    <circle class="node red" cx="1380" cy="180" r="6" stroke="#e63946"/>
+
+    <circle class="node blue" cx="260" cy="160" r="6" stroke="#2b2d42"/>
+    <circle class="node blue" cx="760" cy="240" r="6" stroke="#2b2d42"/>
+    <circle class="node blue" cx="1320" cy="300" r="6" stroke="#2b2d42"/>
+  </g>
+
+  <!-- Light grain overlay -->
+  <rect width="1600" height="600" fill="url(#grain)"/>
+</svg>
