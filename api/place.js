@@ -1,6 +1,7 @@
 // Vercel Serverless Function for Google Maps Place Search// Stub file: API handled by Express in server.js for local development.
 
-export default async function handler(req, res) {// ...existing code...
+export default async function handler(req, res) {
+  // ...existing code...
 
   // Enable CORS
   res.setHeader("Access-Control-Allow-Credentials", "true");
