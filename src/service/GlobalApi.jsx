@@ -22,7 +22,27 @@ export async function getPlacePhotoByText(text) {
       );
       // Log a short snippet to help debugging (avoid dumping entire HTML)
       console.error("HTML snippet:", textBody.slice(0, 200));
-      return null;
+      // Fallback: use public Places client photo flow (no server key exposure) if available
+      const clientKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+      if (!clientKey) return null;
+      try {
+        const tsUrl = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(
+          text
+        )}&key=${clientKey}`;
+        const tsResp = await fetch(tsUrl);
+        const tsData = await tsResp.json();
+        if (!tsData?.results?.length) return null;
+        const place = tsData.results[0];
+        const ref = place?.photos?.[0]?.photo_reference;
+        if (!ref) return null;
+        // Client-side photo URL (this reveals a client key which is fine for public browser usage)
+        return `https://maps.googleapis.com/maps/api/place/photo?maxwidth=1200&photoreference=${encodeURIComponent(
+          ref
+        )}&key=${clientKey}`;
+      } catch (fallbackErr) {
+        console.error("Client-side Places fallback failed", fallbackErr);
+        return null;
+      }
     }
     const data = await resp.json();
     if (!data.photoUrl) return null;
