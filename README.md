@@ -2,6 +2,8 @@
 
 > **Your Personal AI Travel Companion** - Plan the perfect trip in seconds with intelligent itinerary generation powered by Google's Gemini AI.
 
+🌐 **Live Demo:** [https://journi-ai-ai-trip-planner-anzy.vercel.app/](https://journi-ai-ai-trip-planner-anzy.vercel.app/)
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![React](https://img.shields.io/badge/React-19.1.1-61DAFB?logo=react)](https://reactjs.org/)
 [![Vite](https://img.shields.io/badge/Vite-7.1.6-646CFF?logo=vite)](https://vitejs.dev/)
@@ -109,13 +111,13 @@ You'll need to obtain the following API keys:
    VITE_GEMINI_API_KEY=your_gemini_api_key_here
 
    # Google Maps (Client-side)
-   VITE_GOOGLE_MAPS_API_KEY=your_google_maps_client_key_here
+   VITE_GOOGLE_MAPS_API_KEY=your_google_maps_api_key_here
 
-   # Google Maps (Server-side for proxy)
-   GOOGLE_MAPS_API_KEY=your_google_maps_server_key_here
+   # Google Maps (Server-side for API proxy)
+   GOOGLE_MAPS_API_KEY=your_google_maps_api_key_here
 
    # Auth0
-   VITE_AUTH0_DOMAIN=your_auth0_domain
+   VITE_AUTH0_DOMAIN=your_auth0_domain.auth0.com
    VITE_AUTH0_CLIENT_ID=your_auth0_client_id
    VITE_AUTH0_REDIRECT_URI=http://localhost:5173/create-trip
 
@@ -130,7 +132,24 @@ You'll need to obtain the following API keys:
 
    **⚠️ Important:** Never commit your `.env.local` file to version control!
 
-4. **Start the development server**
+4. **Configure Auth0 Application**
+
+   Create a **Single Page Application** in Auth0 Dashboard and configure:
+
+   **Application Settings:**
+   - **Application Type:** Single Page Application
+   - **Allowed Callback URLs:** `http://localhost:5173/create-trip`
+   - **Allowed Logout URLs:** `http://localhost:5173`
+   - **Allowed Web Origins:** `http://localhost:5173`
+   - **Allowed Origins (CORS):** `http://localhost:5173`
+
+   Copy your **Domain** and **Client ID** to `.env.local`:
+   ```env
+   VITE_AUTH0_DOMAIN=your-tenant.us.auth0.com
+   VITE_AUTH0_CLIENT_ID=your_client_id_here
+   ```
+
+5. **Start the development server**
 
    ```bash
    npm run dev
@@ -291,21 +310,77 @@ Modify `src/constants/options.jsx` to add or edit travel preferences.
 
 ## 🚢 Deployment
 
-### Build for Production (Local Only)
+### Deploy to Vercel
+
+This app is optimized for Vercel deployment with serverless functions for API proxying.
+
+**Live Demo:** [https://journi-ai-ai-trip-planner-anzy.vercel.app/](https://journi-ai-ai-trip-planner-anzy.vercel.app/)
+
+#### Quick Deploy Steps:
+
+1. **Push to GitHub**
+   ```bash
+   git push origin main
+   ```
+
+2. **Import to Vercel**
+   - Go to [vercel.com](https://vercel.com)
+   - Click "New Project"
+   - Import your GitHub repository
+
+3. **Configure Environment Variables in Vercel**
+   
+   Add these in Vercel Dashboard → Settings → Environment Variables:
+   
+   ```env
+   VITE_GEMINI_API_KEY=your_gemini_api_key
+   VITE_GOOGLE_MAPS_API_KEY=your_google_maps_api_key
+   GOOGLE_MAPS_API_KEY=your_google_maps_api_key
+   
+   VITE_AUTH0_DOMAIN=your-tenant.us.auth0.com
+   VITE_AUTH0_CLIENT_ID=your_auth0_client_id
+   VITE_AUTH0_REDIRECT_URI=https://your-app.vercel.app/create-trip
+   
+   VITE_FIREBASE_API_KEY=your_firebase_api_key
+   VITE_FIREBASE_AUTH_DOMAIN=your_firebase_auth_domain
+   VITE_FIREBASE_PROJECT_ID=your_firebase_project_id
+   VITE_FIREBASE_STORAGE_BUCKET=your_firebase_storage_bucket
+   VITE_FIREBASE_MESSAGING_SENDER_ID=your_firebase_sender_id
+   VITE_FIREBASE_APP_ID=your_firebase_app_id
+   ```
+
+4. **Update Auth0 for Production**
+   
+   In Auth0 Dashboard → Applications → Your App → Settings, add your Vercel URL:
+   
+   - **Allowed Callback URLs:** 
+     ```
+     http://localhost:5173/create-trip, https://your-app.vercel.app/create-trip
+     ```
+   - **Allowed Logout URLs:** 
+     ```
+     http://localhost:5173, https://your-app.vercel.app
+     ```
+   - **Allowed Web Origins:** 
+     ```
+     http://localhost:5173, https://your-app.vercel.app
+     ```
+   - **Allowed Origins (CORS):** 
+     ```
+     http://localhost:5173, https://your-app.vercel.app
+     ```
+
+5. **Deploy**
+   - Vercel will automatically build and deploy
+   - Visit your deployed URL
+
+### Local Build
 
 ```bash
 npm run build
 ```
 
-This creates an optimized production build in the `dist/` folder. You can serve it locally or deploy to any static host with your own Node.js backend for API proxying. Vercel/serverless is not required or supported in this setup.
-
-### Deployment Platforms
-
-This app can be deployed to:
-
-**Note:** Make sure to set up environment variables in your deployment platform and deploy both the frontend and the Express proxy server.
-
-- ✅ CORS is properly configured in the Express server
+This creates an optimized production build in the `dist/` folder
 
 ---
 
