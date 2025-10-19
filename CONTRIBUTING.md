@@ -5,17 +5,20 @@ Thank you for your interest in contributing! 🎉
 ## How to Contribute
 
 ### Reporting Bugs
+
 - Check existing issues first
 - Use a clear title and description
 - Include steps to reproduce
 - Add screenshots if applicable
 
 ### Suggesting Features
+
 - Open an issue with the `enhancement` label
 - Describe the feature and its benefits
 - Explain why it would be useful
 
 ### Pull Requests
+
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
 3. Make your changes
@@ -36,12 +39,14 @@ npm run dev
 ```
 
 ## Code Style
+
 - Run `npm run lint` before committing
 - Follow existing code patterns
 - Keep components small and focused
 - Use meaningful variable names
 
 ## Questions?
+
 Open an issue or reach out to the maintainers.
 
 Thank you! 🙏

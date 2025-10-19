@@ -12,9 +12,14 @@ function Header() {
   const navigate = useNavigate();
 
   const handleLogOut = () => {
-    localStorage.removeItem("tripFormData");
-    localStorage.removeItem("userData");
-    logout({ returnTo: window.location.origin });
+    const origin = window.location.origin;
+    const isLocal = ["localhost", "127.0.0.1"].includes(
+      window.location.hostname
+    );
+    const returnTo = isLocal
+      ? import.meta.env.VITE_AUTH0_LOGOUT_URL || origin
+      : origin;
+    logout({ returnTo });
     setDropdownOpen(false);
   };
 

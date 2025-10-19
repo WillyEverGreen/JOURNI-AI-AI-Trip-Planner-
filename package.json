@@ -24,8 +24,8 @@
   "scripts": {
     "dev": "concurrently \"npm:serve-api\" \"vite\"",
     "serve-api": "node server.js",
-      "build": "vite build",
-      "vercel-build": "vite build",
+    "build": "vite build",
+    "vercel-build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },

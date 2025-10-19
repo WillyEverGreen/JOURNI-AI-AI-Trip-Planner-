@@ -62,10 +62,11 @@ VITE_FIREBASE_APP_ID=your_firebase_app_id
 ```
 
 **Important Notes:**
+
 - Replace `https://your-app.vercel.app` with your actual Vercel deployment URL
 - You can find your Vercel URL in the deployment settings
 - All `VITE_*` variables are exposed to the client, so use client-safe keys only
-- `GOOGLE_MAPS_API_KEY` (without VITE_ prefix) is server-side only
+- `GOOGLE_MAPS_API_KEY` (without VITE\_ prefix) is server-side only
 
 ### 4. Configure Auth0 Callback URL
 
@@ -120,6 +121,7 @@ The React app is built using Vite and deployed as static files:
 ### Setting Variables
 
 **Via Vercel Dashboard:**
+
 1. Go to your project
 2. Click **"Settings"** → **"Environment Variables"**
 3. Add each variable (Name and Value)
@@ -127,6 +129,7 @@ The React app is built using Vite and deployed as static files:
 5. Click **"Save"**
 
 **Via Vercel CLI:**
+
 ```bash
 vercel env add VITE_GEMINI_API_KEY
 # Paste your key when prompted
@@ -161,14 +164,16 @@ Configure in **Settings** → **Git**
 ### Vercel Analytics (Optional)
 
 1. Install Vercel Analytics:
+
    ```bash
    npm install @vercel/analytics
    ```
 
 2. Add to `src/main.jsx`:
+
    ```jsx
-   import { Analytics } from '@vercel/analytics/react';
-   
+   import { Analytics } from "@vercel/analytics/react";
+
    // Add <Analytics /> component
    ```
 
@@ -177,6 +182,7 @@ Configure in **Settings** → **Git**
 ### Error Tracking
 
 Check serverless function logs:
+
 1. Go to **Deployments** → Select a deployment
 2. Click **"Functions"** tab
 3. View real-time logs
@@ -186,20 +192,24 @@ Check serverless function logs:
 ### Build Fails
 
 **Error: "Command failed: npm run vercel-build"**
+
 - Check `package.json` has `"vercel-build": "vite build"`
 - Ensure all dependencies are in `dependencies` (not just `devDependencies`)
 
 **Error: "Module not found"**
+
 - Run `npm install` locally to verify dependencies
 - Check import paths are correct
 
 ### API Functions Not Working
 
 **Error: "API key not configured"**
+
 - Verify `GOOGLE_MAPS_API_KEY` is set in Vercel environment variables
 - Redeploy after adding variables
 
 **CORS Errors:**
+
 - API functions include CORS headers
 - Check browser console for specific error
 - Verify API function is responding at `/api/place` and `/api/photo`
@@ -207,12 +217,14 @@ Check serverless function logs:
 ### Auth0 Issues
 
 **Error: "Redirect URI mismatch"**
+
 - Update Auth0 callback URLs with your Vercel domain
 - Ensure `VITE_AUTH0_REDIRECT_URI` matches exactly
 
 ### Firebase Issues
 
 **Error: "Firebase: Error (auth/unauthorized-domain)"**
+
 - Add your Vercel domain to Firebase authorized domains
 - Firebase Console → Authentication → Settings → Authorized Domains
 
@@ -221,6 +233,7 @@ Check serverless function logs:
 ### Vercel Configuration
 
 The `vercel.json` file is already optimized:
+
 - Static asset caching
 - API function routing
 - Automatic HTTPS
@@ -234,6 +247,7 @@ The `vercel.json` file is already optimized:
 ## Cost Considerations
 
 ### Vercel Free Tier Includes:
+
 - ✅ Unlimited deployments
 - ✅ 100 GB bandwidth/month
 - ✅ Serverless function executions: 100 GB-Hrs
@@ -244,6 +258,7 @@ The `vercel.json` file is already optimized:
 **Enough for most personal projects!**
 
 ### Monitoring Usage:
+
 - Check **Settings** → **Usage** in Vercel Dashboard
 - Set up alerts for approaching limits
 

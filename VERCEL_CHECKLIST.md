@@ -5,6 +5,7 @@ Use this checklist to ensure your app is ready for Vercel deployment.
 ## ✅ Pre-Deployment Checklist
 
 ### 1. Code & Repository
+
 - [ ] All changes committed to Git
 - [ ] Code pushed to GitHub
 - [ ] `.env.local` is in `.gitignore` (never commit secrets!)
@@ -13,6 +14,7 @@ Use this checklist to ensure your app is ready for Vercel deployment.
 - [ ] Linting passes (`npm run lint`)
 
 ### 2. API Keys Ready
+
 - [ ] Google Gemini API key
 - [ ] Google Maps API key (client-side)
 - [ ] Google Maps API key (server-side)
@@ -20,6 +22,7 @@ Use this checklist to ensure your app is ready for Vercel deployment.
 - [ ] Firebase configuration (all 6 variables)
 
 ### 3. API Key Configurations
+
 - [ ] Google Maps API has proper restrictions set
   - HTTP referrer restrictions for client key
   - No restrictions (or IP) for server key
@@ -29,6 +32,7 @@ Use this checklist to ensure your app is ready for Vercel deployment.
   - Geocoding API
 
 ### 4. Auth0 Configuration
+
 - [ ] Auth0 application created
 - [ ] Application type: Single Page Application
 - [ ] Allowed Callback URLs ready to update with Vercel URL
@@ -36,6 +40,7 @@ Use this checklist to ensure your app is ready for Vercel deployment.
 - [ ] Allowed Web Origins ready to update with Vercel URL
 
 ### 5. Firebase Configuration
+
 - [ ] Firebase project created
 - [ ] Firestore database enabled
 - [ ] Authentication enabled
@@ -46,19 +51,23 @@ Use this checklist to ensure your app is ready for Vercel deployment.
 ## 🌐 Vercel Deployment Steps
 
 ### Step 1: Import to Vercel
+
 - [ ] Go to [Vercel Dashboard](https://vercel.com/dashboard)
 - [ ] Click "Add New Project"
 - [ ] Import your GitHub repository
 - [ ] Click "Import"
 
 ### Step 2: Configure Build Settings
+
 Vercel should auto-detect these (verify):
+
 - [ ] Framework Preset: `Vite`
 - [ ] Build Command: `vite build` (or auto)
 - [ ] Output Directory: `dist`
 - [ ] Install Command: `npm install` (or auto)
 
 ### Step 3: Add Environment Variables
+
 In Vercel → Settings → Environment Variables, add:
 
 - [ ] `VITE_GEMINI_API_KEY`
@@ -77,6 +86,7 @@ In Vercel → Settings → Environment Variables, add:
 **Select all environments:** Production, Preview, Development
 
 ### Step 4: Deploy
+
 - [ ] Click "Deploy"
 - [ ] Wait for build to complete
 - [ ] Note your Vercel URL (e.g., `your-app.vercel.app`)
@@ -86,6 +96,7 @@ In Vercel → Settings → Environment Variables, add:
 ## 🔧 Post-Deployment Configuration
 
 ### Update Auth0
+
 - [ ] Go to [Auth0 Dashboard](https://manage.auth0.com)
 - [ ] Navigate to Applications → Your App
 - [ ] Update **Allowed Callback URLs**:
@@ -103,6 +114,7 @@ In Vercel → Settings → Environment Variables, add:
 - [ ] Save Changes
 
 ### Update Firebase
+
 - [ ] Go to [Firebase Console](https://console.firebase.google.com)
 - [ ] Select your project
 - [ ] Go to Authentication → Settings → Authorized Domains
@@ -110,6 +122,7 @@ In Vercel → Settings → Environment Variables, add:
 - [ ] Save
 
 ### Update Environment Variable
+
 - [ ] Go back to Vercel
 - [ ] Settings → Environment Variables
 - [ ] Update `VITE_AUTH0_REDIRECT_URI` to:
@@ -123,12 +136,14 @@ In Vercel → Settings → Environment Variables, add:
 ## ✨ Testing Deployment
 
 ### Basic Tests
+
 - [ ] Visit your Vercel URL
 - [ ] Homepage loads correctly
 - [ ] Images and styles load
 - [ ] Navigation works
 
 ### Authentication Test
+
 - [ ] Click "Get Started" or "Sign In"
 - [ ] Auth0 login page appears
 - [ ] Can sign up/login successfully
@@ -136,6 +151,7 @@ In Vercel → Settings → Environment Variables, add:
 - [ ] User profile shows correctly
 
 ### Trip Creation Test
+
 - [ ] Navigate to "Create Trip"
 - [ ] Location search works
 - [ ] Can select all options (days, budget, travelers)
@@ -146,13 +162,16 @@ In Vercel → Settings → Environment Variables, add:
 - [ ] Can click hotels/places (opens Google Maps)
 
 ### Trip Management Test
+
 - [ ] Navigate to "My Trips"
 - [ ] Created trips appear
 - [ ] Can click to view trip details
 - [ ] Images load properly
 
 ### API Function Test
+
 Check browser DevTools → Network tab:
+
 - [ ] Requests to `/api/place` succeed (200 status)
 - [ ] Requests to `/api/photo` succeed (200 status)
 - [ ] No CORS errors
@@ -163,30 +182,35 @@ Check browser DevTools → Network tab:
 ## 🐛 Troubleshooting
 
 ### Build Fails
+
 - [ ] Check deployment logs in Vercel
 - [ ] Verify all dependencies in `package.json`
 - [ ] Test `npm run build` locally
 - [ ] Check for ESLint errors
 
 ### API Not Working
+
 - [ ] Verify `GOOGLE_MAPS_API_KEY` is set
 - [ ] Check serverless function logs in Vercel
 - [ ] Test API directly: `https://your-app.vercel.app/api/place?text=Paris`
 - [ ] Verify API key has proper permissions
 
 ### Auth0 Issues
+
 - [ ] Verify callback URLs match exactly
 - [ ] Check Auth0 application logs
 - [ ] Verify all Auth0 env vars are set
 - [ ] Try clearing browser cookies/cache
 
 ### Firebase Issues
+
 - [ ] Verify domain is authorized in Firebase
 - [ ] Check Firebase security rules
 - [ ] Verify all Firebase config vars are set
 - [ ] Check browser console for errors
 
 ### Images Not Loading
+
 - [ ] Check `/api/photo` endpoint works
 - [ ] Verify Google Maps API key permissions
 - [ ] Check browser console for errors
@@ -204,6 +228,7 @@ Once all items are checked:
 ✅ CDN is optimized
 
 ### Next Steps:
+
 - [ ] Share your app URL
 - [ ] Add custom domain (optional)
 - [ ] Set up monitoring/analytics
