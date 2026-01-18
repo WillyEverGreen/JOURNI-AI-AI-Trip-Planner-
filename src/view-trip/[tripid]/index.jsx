@@ -25,22 +25,23 @@ function Viewtrip() {
   const [trip, setTrip] = useState(null);
 
   useEffect(() => {
-    tripid && GetTripData();
+    //to retrive the insformation from firebase
+    const GetTripData = async () => {
+      if (!tripid) return;
+      const docRef = doc(db, "trips", tripid);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        console.log("Document: ", docSnap.data());
+        setTrip(docSnap.data());
+      } else {
+        console.log("No document was found");
+        toast.error("No trip found");
+      }
+    };
+
+    GetTripData();
   }, [tripid]);
-
-  //to retrive the insformation from firebase
-  const GetTripData = async () => {
-    const docRef = doc(db, "trips", tripid);
-    const docSnap = await getDoc(docRef);
-
-    if (docSnap.exists()) {
-      console.log("Document: ", docSnap.data());
-      setTrip(docSnap.data());
-    } else {
-      console.log("No document was found");
-      toast.error("No trip found");
-    }
-  };
 
   return (
     <div className="w-full">

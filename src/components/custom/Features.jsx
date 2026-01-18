@@ -1,7 +1,9 @@
 import React, { useRef } from "react";
 import { Compass, Map, CalendarClock, Camera } from "lucide-react";
 import { BentoGrid, BentoGridItem } from "../ui/bento-grid";
-import { cn } from "../../lib/utils";
+import { BentoGrid, BentoGridItem } from "../ui/bento-grid";
+// import { cn } from "../../lib/utils"; // Unused
+import gsap from "gsap";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";

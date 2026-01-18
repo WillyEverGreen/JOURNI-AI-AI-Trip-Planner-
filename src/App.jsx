@@ -6,7 +6,7 @@ import Testimonials from "./components/custom/Testimonials";
 import HowItWorks from "./components/custom/HowItWorks";
 import CTA from "./components/custom/CTA";
 import Header from "./components/custom/header";
-import { motion } from "framer-motion";
+import { motion } from "framer-motion"; // eslint-disable-line no-unused-vars
 import Loader from "./components/custom/Loader";
 import ScrollProgressCar from "./components/custom/ScrollProgressCar";
 import { Footer7 } from "./components/ui/footer-7";

@@ -16,16 +16,7 @@ function MyTrips() {
   // State to handle loading indicator while fetching trips
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (isLoading) return; // Wait for Auth0 to finish loading
-    if (!isAuthenticated) {
-      loginWithRedirect();
-      return;
-    }
-    fetchUserTrips();
-  }, [isAuthenticated, isLoading]);
-
-  const fetchUserTrips = async () => {
+  const fetchUserTrips = React.useCallback(async () => {
     try {
       const tripRef = collection(db, "trips");
 
@@ -53,7 +44,16 @@ function MyTrips() {
       // Stop loading indicator
       setLoading(false);
     }
-  };
+  }, [user]);
+
+  useEffect(() => {
+    if (isLoading) return; // Wait for Auth0 to finish loading
+    if (!isAuthenticated) {
+      loginWithRedirect();
+      return;
+    }
+    fetchUserTrips();
+  }, [isAuthenticated, isLoading, loginWithRedirect, fetchUserTrips]);
   // Show loading message while trips are being fetched
   if (loading) {
     return (

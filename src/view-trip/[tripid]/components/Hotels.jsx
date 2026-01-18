@@ -2,12 +2,12 @@ import React from "react";
 import PlaceImage from "./PlaceImage";
 
 function Hotels({ trip }) {
-  // Collect all hotels from all days using flatMap
-  const allHotels =
-    trip?.tripPlan?.days?.flatMap((day) => day.hotels || []) || [];
-
   // Deduplicate by normalized name + address to avoid repeated entries across days
   const uniqueHotels = React.useMemo(() => {
+    // Collect all hotels from all days using flatMap inside useMemo
+    const allHotels =
+      trip?.tripPlan?.days?.flatMap((day) => day.hotels || []) || [];
+
     const map = new Map();
     for (const h of allHotels) {
       if (!h) continue;
@@ -20,7 +20,7 @@ function Hotels({ trip }) {
       }
     }
     return Array.from(map.values());
-  }, [allHotels]);
+  }, [trip]);
 
   // Open hotel info page (prefer place_id if available)
   const handleNavigate = (address, name) => {

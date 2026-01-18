@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
-import { motion } from "framer-motion";
+import { motion } from "framer-motion"; // eslint-disable-line no-unused-vars
 
 export default function Loader({ onComplete }) {
   const [complete, setComplete] = useState(false);
