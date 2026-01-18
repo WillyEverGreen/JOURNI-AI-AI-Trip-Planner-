@@ -15,7 +15,6 @@ const router = createBrowserRouter([
     path: "/",
     element: (
       <>
-        <Header /> {/* ✅ inside router */}
         <App />
       </>
     ),

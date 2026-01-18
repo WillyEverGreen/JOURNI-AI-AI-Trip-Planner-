@@ -36,7 +36,7 @@ function Header() {
         <img
           src={logo}
           alt="TripGPT Logo"
-          className="h-14 sm:h-16 md:h-18 cursor-pointer"
+          className="h-10 sm:h-12 md:h-14 cursor-pointer"
           onClick={redirectToHomePage}
         />
       </div>

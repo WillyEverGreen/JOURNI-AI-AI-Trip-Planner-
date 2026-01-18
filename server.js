@@ -14,65 +14,64 @@ if (fs.existsSync(localEnv)) {
 const app = express();
 app.use(cors());
 
-const API_KEY = process.env.GOOGLE_MAPS_API_KEY;
-if (!API_KEY) console.warn("GOOGLE_MAPS_API_KEY not set in environment");
+const GOOGLE_API_KEY = process.env.GOOGLE_MAPS_API_KEY || process.env.VITE_GOOGLE_MAPS_API_KEY;
+if (!GOOGLE_API_KEY) console.warn("GOOGLE_MAPS_API_KEY not set in environment");
 
-// Prefer the global fetch available in Node 18+. If not present, we'll error at runtime
+// Prefer global fetch
 const globalFetch = globalThis.fetch;
-if (!globalFetch) {
-  console.warn(
-    "Global fetch is not available in this Node runtime. Please use Node 18+ or install a compatible fetch polyfill (e.g., node-fetch)"
-  );
-}
 
-// Search for a place and return a proxied photo URL (or null)
+// Scrape Google Images as requested by user (fallback for API key issues)
 app.get("/api/place", async (req, res) => {
   const text = req.query.text;
   if (!text) return res.status(400).json({ error: "text is required" });
+
   try {
-    const url = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(
-      text
-    )}&key=${API_KEY}`;
+    // Scrape Bing Images for better quality (high-res retrieval is easier than Google)
+    // "murl" in Bing HTML usually points to the original image
+    const cleanText = text.replace(/map|direction|location/gi, "").trim();
+    const query = `${cleanText} tourist attraction scenery`;
+    const url = `https://www.bing.com/images/search?q=${encodeURIComponent(query)}&first=1`;
+    
+    // Mimic a browser to avoid blocking
+    const options = {
+      method: 'GET',
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+      }
+    };
+
     const r = await (globalFetch
-      ? globalFetch(url)
-      : (await import("node-fetch")).default(url));
-    const data = await r.json();
-    if (!data.results || data.results.length === 0)
-      return res.json({ photoUrl: null });
-    const place = data.results[0];
-    if (place.photos && place.photos.length > 0) {
-      const ref = place.photos[0].photo_reference;
-      // Provide a proxied endpoint so client doesn't see the API key
-      return res.json({
-        photoUrl: `/api/photo?ref=${encodeURIComponent(ref)}`,
-      });
+      ? globalFetch(url, options)
+      : (await import("node-fetch")).default(url, options));
+
+    // Bing returns 200 even if blocked, but we check anyway
+    if (!r.ok) {
+       console.error("Scrape error:", r.status, await r.text());
+       return res.json({ photoUrl: null });
     }
+
+    const html = await r.text();
+    
+    // Look for Bing's "murl" (Media URL) which links to the original image
+    // It is often HTML-encoded inside the page source
+    const match = html.match(/murl&quot;:&quot;(http[^&]+)&quot;/);
+    
+    if (match && match[1]) {
+      return res.json({ photoUrl: match[1] });
+    }
+    
+    // Fallback: Try simpler pattern or unencoded pattern
+    const match2 = html.match(/"murl":"(http[^"]+)"/);
+    if (match2 && match2[1]) {
+         return res.json({ photoUrl: match2[1] });
+    }
+    
+    console.warn("No image found in scrape for:", text);
     return res.json({ photoUrl: null });
+
   } catch (e) {
     console.error("Error in /api/place", e);
     res.status(500).json({ error: "server error" });
-  }
-});
-
-// Proxy the actual photo request and stream it back to the client
-app.get("/api/photo", async (req, res) => {
-  const ref = req.query.ref;
-  if (!ref) return res.status(400).send("ref required");
-  try {
-    const url = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=1200&photoreference=${encodeURIComponent(
-      ref
-    )}&key=${API_KEY}`;
-    const r = await (globalFetch
-      ? globalFetch(url)
-      : (await import("node-fetch")).default(url));
-    if (!r.ok) return res.status(r.status).send("failed to fetch photo");
-    const contentType = r.headers.get("content-type") || "image/jpeg";
-    res.setHeader("Content-Type", contentType);
-    const buffer = await r.arrayBuffer();
-    res.send(Buffer.from(buffer));
-  } catch (e) {
-    console.error("Error in /api/photo", e);
-    res.status(500).send("server error");
   }
 });
 

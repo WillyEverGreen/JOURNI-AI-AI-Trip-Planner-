@@ -1,57 +1,63 @@
-// Vercel serverless function for Google Maps place search
+import fetch from 'node-fetch';
+
+// Vercel Serverless Function for /api/place
 export default async function handler(req, res) {
   // Enable CORS
+  res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
+  res.setHeader(
+    'Access-Control-Allow-Headers',
+    'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
+  );
 
-  // Handle preflight requests
   if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
-
-  // Only allow GET requests
-  if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Method not allowed' });
+    res.status(200).end();
+    return;
   }
 
   const { text } = req.query;
-  
   if (!text) {
-    return res.status(400).json({ error: 'text is required' });
-  }
-
-  const API_KEY = process.env.GOOGLE_MAPS_API_KEY;
-  if (!API_KEY) {
-    console.error('GOOGLE_MAPS_API_KEY not set in environment');
-    return res.status(500).json({ error: 'Server configuration error' });
+    return res.status(400).json({ error: "text is required" });
   }
 
   try {
-    const url = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(
-      text
-    )}&key=${API_KEY}`;
+    // Scrape Bing Images logic (same as server.js)
+    const cleanText = text.replace(/map|direction|location/gi, "").trim();
+    const query = `${cleanText} tourist attraction scenery`;
+    const url = `https://www.bing.com/images/search?q=${encodeURIComponent(query)}&first=1`;
     
-    const response = await fetch(url);
-    const data = await response.json();
+    const options = {
+      method: 'GET',
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+      }
+    };
+
+    const r = await fetch(url, options);
+
+    if (!r.ok) {
+       console.error("Scrape error:", r.status, await r.text());
+       return res.json({ photoUrl: null });
+    }
+
+    const html = await r.text();
     
-    if (!data.results || data.results.length === 0) {
-      return res.json({ photoUrl: null });
+    const match = html.match(/murl&quot;:&quot;(http[^&]+)&quot;/);
+    if (match && match[1]) {
+      return res.json({ photoUrl: match[1] });
     }
     
-    const place = data.results[0];
-    
-    if (place.photos && place.photos.length > 0) {
-      const ref = place.photos[0].photo_reference;
-      // Provide a proxied endpoint so client doesn't see the API key
-      return res.json({
-        photoUrl: `/api/photo?ref=${encodeURIComponent(ref)}`,
-      });
+    const match2 = html.match(/"murl":"(http[^"]+)"/);
+    if (match2 && match2[1]) {
+         return res.json({ photoUrl: match2[1] });
     }
     
+    console.warn("No image found in scrape for:", text);
     return res.json({ photoUrl: null });
-  } catch (error) {
-    console.error('Error in /api/place:', error);
-    return res.status(500).json({ error: 'Server error' });
+
+  } catch (e) {
+    console.error("Error in /api/place", e);
+    res.status(500).json({ error: "server error" });
   }
 }

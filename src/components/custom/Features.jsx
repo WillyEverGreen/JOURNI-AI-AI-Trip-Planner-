@@ -1,68 +1,111 @@
-import React from "react";
+import React, { useRef } from "react";
 import { Compass, Map, CalendarClock, Camera } from "lucide-react";
-import useRevealOnScroll from "./useRevealOnScroll";
+import { BentoGrid, BentoGridItem } from "../ui/bento-grid";
+import { cn } from "../../lib/utils";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useGSAP } from "@gsap/react";
+
+gsap.registerPlugin(ScrollTrigger);
 
 const features = [
   {
     title: "Smart Itineraries",
-    desc: "AI-curated day-by-day plans that fit your vibe and time.",
-    icon: CalendarClock,
+    description: "AI-curated day-by-day plans that fit your vibe and time.",
+    icon: <CalendarClock className="h-4 w-4 text-neutral-500" />,
+     className: "md:col-span-1",
+     img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2073&auto=format&fit=crop",
   },
   {
     title: "Discover Hidden Gems",
-    desc: "Find places locals love, not just tourist traps.",
-    icon: Compass,
+    description: "Find places locals love, not just tourist traps.",
+    icon: <Compass className="h-4 w-4 text-neutral-500" />,
+     className: "md:col-span-2",
+     img: "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?q=80&w=2070&auto=format&fit=crop",
   },
   {
     title: "Interactive Maps",
-    desc: "See everything on a clean, shareable map.",
-    icon: Map,
+    description: "See everything on a clean, shareable map.",
+    icon: <Map className="h-4 w-4 text-neutral-500" />,
+     className: "md:col-span-2",
+     img: "https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=2074&auto=format&fit=crop",
   },
   {
     title: "Picture-Perfect Picks",
-    desc: "Rich visuals of hotels, spots, and activities.",
-    icon: Camera,
+    description: "Rich visuals of hotels, spots, and activities.",
+    icon: <Camera className="h-4 w-4 text-neutral-500" />,
+     className: "md:col-span-1",
+     img: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?q=80&w=1964&auto=format&fit=crop",
   },
 ];
 
 export default function Features() {
-  useRevealOnScroll();
+  const containerRef = useRef(null);
+  
+  useGSAP(() => {
+    gsap.fromTo(
+      ".bento-item",
+      { opacity: 0, y: 50 },
+      {
+        opacity: 1,
+        y: 0,
+        duration: 0.8,
+        stagger: 0.2,
+        ease: "power3.out",
+        scrollTrigger: {
+          trigger: containerRef.current,
+          start: "top 60%",
+          toggleActions: "play none none none",
+        },
+      }
+    );
+     // Animate Title separately
+     gsap.fromTo(
+      ".features-title",
+      { opacity: 0, y: 30 },
+      {
+        opacity: 1,
+        y: 0,
+        duration: 0.8,
+        ease: "power3.out",
+         scrollTrigger: {
+          trigger: containerRef.current,
+          start: "top 60%", 
+          toggleActions: "play none none none",
+        },
+      }
+     )
+  }, { scope: containerRef });
+
   return (
-    <section className="relative px-6 py-20 md:py-24">
+    <section ref={containerRef} className="relative px-6 py-48 md:py-60 bg-transparent">
       <div className="mx-auto max-w-6xl">
         <h2
-          data-reveal
-          className="text-center text-3xl md:text-4xl font-extrabold text-[#2b2d42]"
-          style={{ transitionDelay: "60ms" }}
+          className="features-title text-center text-3xl md:text-4xl font-extrabold text-[#2b2d42] mb-12"
         >
           Everything you need to plan better
         </h2>
-        <p
-          data-reveal
-          className="mx-auto mt-3 max-w-2xl text-center text-[#8d99ae]"
-          style={{ transitionDelay: "140ms" }}
-        >
-          Built-in smarts and a delightful UI to make trip planning effortless.
-        </p>
-
-        <div className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {features.map((f, i) => (
-            <div
-              data-reveal
-              key={f.title}
-              className="group rounded-2xl border border-black/5 bg-white p-6 shadow-[0_10px_30px_-15px_rgba(0,0,0,0.25)] transition hover:-translate-y-1 hover:shadow-[0_20px_50px_-15px_rgba(0,0,0,0.3)]"
-              style={{ transitionDelay: `${120 + i * 80}ms` }}
-            >
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#e63946]/10 text-[#e63946]">
-                {React.createElement(f.icon, { size: 24 })}
-              </div>
-              <h3 className="mt-4 text-lg font-bold text-[#2b2d42]">
-                {f.title}
-              </h3>
-              <p className="mt-2 text-sm text-[#6b7280]">{f.desc}</p>
-            </div>
-          ))}
-        </div>
+       
+       <BentoGrid className="max-w-4xl mx-auto md:auto-rows-[20rem]">
+        {features.map((item, i) => (
+          <BentoGridItem
+            key={i}
+            title={item.title}
+            description={item.description}
+            header={
+                <div className="flex flex-1 w-full h-full min-h-[6rem] rounded-xl overflow-hidden">
+                    <img 
+                        src={item.img} 
+                        alt={item.title} 
+                        className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
+                    />
+                </div>
+            }
+            icon={item.icon}
+            className={item.className}
+          />
+        ))}
+      </BentoGrid>
       </div>
     </section>
   );
