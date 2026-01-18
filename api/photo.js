@@ -1,4 +1,5 @@
 /* eslint-env node */
+/* global process, Buffer */
 // Vercel serverless function for Google Maps photo proxy
 export default async function handler(req, res) {
   // Enable CORS

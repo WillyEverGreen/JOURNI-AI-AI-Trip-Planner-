@@ -1,7 +1,7 @@
 import React, { useRef } from "react";
 import { Button } from "../ui/button";
 import { Link } from "react-router-dom";
-import useRevealOnScroll from "./useRevealOnScroll";
+// import useRevealOnScroll from "./useRevealOnScroll"; // Unused
 import { AuroraBackground } from "../ui/aurora-background";
 import heroImg from "../../assets/hero-img.jpg";
 import gsap from "gsap";

@@ -1,7 +1,5 @@
 import { TestimonialsColumn } from "../ui/testimonials-columns";
-import { TestimonialsColumn } from "../ui/testimonials-columns";
 // import { motion } from "motion/react"; // Unused
-import React, { useRef } from "react";
 import React, { useRef } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";

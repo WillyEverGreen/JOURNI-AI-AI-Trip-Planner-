@@ -3,7 +3,7 @@ import { Button } from "../ui/button.jsx";
 import { useAuth0 } from "@auth0/auth0-react";
 import logo from "../../assets/logo.jpg";
 import { useNavigate } from "react-router-dom";
-import useRevealOnScroll from "./useRevealOnScroll";
+// import useRevealOnScroll from "./useRevealOnScroll"; // Unused
 
 function Header() {
   const { isAuthenticated, loginWithRedirect, logout, user } = useAuth0();

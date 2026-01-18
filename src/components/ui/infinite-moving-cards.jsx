@@ -12,6 +12,8 @@ export const InfiniteMovingCards = ({
 }) => {
   const containerRef = React.useRef(null);
   const scrollerRef = React.useRef(null);
+  const [start, setStart] = useState(false);
+
 
   useEffect(() => {
     // Define helper functions inside effect to avoid dependency issues
