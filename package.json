@@ -1,7 +1,7 @@
 {
   "name": "journi-ai-trip-planner",
   "version": "1.0.0",
-  "description": "AI-powered trip planner using Google Gemini AI for intelligent itinerary generation",
+  "description": "AI-powered trip planner using Qubrid AI for intelligent itinerary generation",
   "author": "Willy EverGreen",
   "license": "MIT",
   "repository": {
@@ -11,7 +11,7 @@
   "keywords": [
     "trip-planner",
     "ai",
-    "gemini",
+    "qubrid",
     "travel",
     "itinerary",
     "react",
