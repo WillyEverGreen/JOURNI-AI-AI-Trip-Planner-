@@ -65,15 +65,8 @@ const repairJson = (text) => {
   return json;
 };
 
-/**
- * Generates a trip itinerary using the Qubrid AI backend proxy.
- */
 export async function generateTrip(prompt) {
   try {
-    // Dynamically adjust max tokens for longer trips
-    const requestedDays = prompt.match(/(\d+)-day/)?.[1] || 1;
-    const calculatedMaxTokens = Math.min(8192, (requestedDays * 800) + 1000);
-
     const response = await fetch("/api/chat", {
       method: "POST",
       headers: {
@@ -85,7 +78,7 @@ export async function generateTrip(prompt) {
           {
             role: "system",
             content:
-              "You are an expert AI Trip Planner. Generate detailed travel itineraries in JSON format. IMPORTANT: Output ONLY standard JSON. NEVER include comments, notes, or markdown. Output must be raw JSON only.",
+              "You are an expert AI Trip Planner. Generate detailed travel itineraries in JSON format only. IMPORTANT: Your response must START with '{' and END with '}'. NEVER include any text, comments, placeholders (like // ...), or notes outside or inside the JSON object.",
           },
           {
             role: "user",
@@ -93,7 +86,7 @@ export async function generateTrip(prompt) {
           },
         ],
         temperature: 0.7,
-        max_tokens: calculatedMaxTokens,
+        max_tokens: 5000,
         stream: true,
       }),
     });

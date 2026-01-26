@@ -88,8 +88,8 @@ function CreateTrip() {
       return;
     }
 
-    if (noOfDays > 10) {
-      toast.error("Number of days can't be more than 10!😠");
+    if (noOfDays > 5) {
+      toast.error("Number of days can't be more than 5 for better itinerary details! 😌");
       return;
     }
 
