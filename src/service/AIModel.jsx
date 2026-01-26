@@ -65,6 +65,40 @@ const repairJson = (text) => {
   return json;
 };
 
+// Helper to fix common AI formatting mistakes
+const protectStructure = (data) => {
+  if (!data || typeof data !== "object") return null;
+
+  // 1. Ensure tripName exists
+  if (!data.tripName) data.tripName = "Your Trip Plan";
+
+  // 2. Ensure hotels is an array
+  if (!Array.isArray(data.hotels)) data.hotels = [];
+
+  // 3. Fix Days array
+  if (Array.isArray(data.days)) {
+    data.days = data.days.map((dayObj, index) => {
+      // Fix string-formatted days: "Day 1" -> 1
+      if (typeof dayObj.day === "string") {
+        const num = parseInt(dayObj.day.replace(/\D/g, ""));
+        dayObj.day = isNaN(num) ? index + 1 : num;
+      }
+      // Ensure day is at least index + 1 if missing
+      if (!dayObj.day) dayObj.day = index + 1;
+
+      // Ensure activities and restaurants are arrays
+      if (!Array.isArray(dayObj.activities)) dayObj.activities = [];
+      if (!Array.isArray(dayObj.restaurants)) dayObj.restaurants = [];
+
+      return dayObj;
+    });
+  } else {
+    data.days = [];
+  }
+
+  return data;
+};
+
 export async function generateTrip(prompt) {
   try {
     const response = await fetch("/api/chat", {
@@ -102,31 +136,33 @@ export async function generateTrip(prompt) {
 
     console.log("Qubrid (via Proxy) Full Text:", fullText);
 
+    let parsed = null;
     // Robust parsing strategy:
-    // 1. Try direct parse
     try {
-      return JSON.parse(fullText);
+      parsed = JSON.parse(fullText);
     } catch (e) {
-      // 2. Try to find the first '{' and the last '}' to strip AI chatter
+      // Try to find the first '{' and the last '}' to strip AI chatter
       try {
         const start = fullText.indexOf("{");
         const end = fullText.lastIndexOf("}");
         if (start !== -1 && end !== -1 && end > start) {
-          return JSON.parse(fullText.substring(start, end + 1));
+          parsed = JSON.parse(fullText.substring(start, end + 1));
         }
       } catch (e2) {}
 
-      // 3. Fallback to aggressive repair
-      console.warn("Standard JSON parse failed, attempting repair...");
-      try {
-        const repaired = repairJson(fullText);
-        if (!repaired) return null;
-        return JSON.parse(repaired);
-      } catch (repairErr) {
-        console.error("JSON repair failed", repairErr);
-        return null;
+      if (!parsed) {
+        console.warn("Standard parse failed, attempting repair...");
+        try {
+          const repaired = repairJson(fullText);
+          if (repaired) parsed = JSON.parse(repaired);
+        } catch (repairErr) {
+          console.error("JSON repair failed", repairErr);
+        }
       }
     }
+
+    // Apply structure protection to fix AI hallucinations
+    return protectStructure(parsed);
   } catch (err) {
     console.error("Error calling Backend Proxy:", err);
     return null;
@@ -142,3 +178,4 @@ export function getTripPrompt(formData) {
     budget: formData.budget,
   });
 }
+

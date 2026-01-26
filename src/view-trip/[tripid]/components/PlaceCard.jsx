@@ -12,9 +12,12 @@ function PlaceCard({ activity }) {
         />
       </div>
       <div>
+        <h2 className="text-amber-600 font-bold text-sm mb-1">🕒 {activity.time}</h2>
         <h2 className="font-bold text-lg">{activity.name}</h2>
         <p className="text-[#8d99ae] mb-1.5">{activity.description}</p>
-        <span className=" text-[#2b2d42]">🕛{activity.timeToTravel}</span>
+        {activity.timeToTravel && (
+          <span className=" text-[#2b2d42] text-xs">🕛 {activity.timeToTravel}</span>
+        )}
       </div>
     </div>
   );

@@ -34,10 +34,7 @@ function PlacesToVisit({ trip }) {
                   }
                   className="cursor-pointer"
                 >
-                  <h2 className="text-amber-600 font-bold"> {activity.time}</h2>
-                  <div>
-                    <PlaceCard activity={activity} />
-                  </div>
+                  <PlaceCard activity={activity} />
                 </div>
               ))}
             </div>

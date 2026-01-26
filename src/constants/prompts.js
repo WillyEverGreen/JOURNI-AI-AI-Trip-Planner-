@@ -4,56 +4,28 @@ export const generateTripPrompt = ({
   travelers,
   budget,
 }) => `
-Create a ${noOfDays}-day trip plan to ${destination} for ${travelers} travelers with a ${budget} budget. 
+Create a detailed JSON itinerary for ${noOfDays} days in ${destination}.
+Travelers: ${travelers}, Budget: ${budget}.
 
-IMPORTANT: 
-1. You MUST generate an itinerary for ALL ${noOfDays} days.
-2. Each day must be a separate object in the "days" array.
-3. DO NOT include "imageUrl" fields. The app handles images automatically.
-4. Keep activity descriptions brief.
-5. Provide 3 hotel recommendations in a root-level "hotels" array.
-
-Please provide the output in JSON format only following this structure:
-
+SCHEMA:
 {
-  "tripName": "String",
-  "hotels": [
-    {
-      "name": "Hotel name",
-      "rating": "Hotel rating",
-      "priceRange": "Approximate price per night in Indian Rupees (₹)",
-      "address": "Hotel address"
-    }
-  ],
-  "days": [
-    {
-      "day": 1,
-      "activities": [
-        {
-          "name": "Sightseeing spot or activity",
-          "description": "Short description",
-          "rating": "Average rating if available",
-          "location": "Address or area",
-          "time": "Time slot (e.g., 10:00 AM - 12:00 PM)",
-          "timeToTravel": "Travel time (e.g., '15 mins')"
-        }
-      ],
-      "restaurants": [
-        {
-          "name": "Restaurant name",
-          "cuisine": "Type of food",
-          "rating": "Rating out of 5",
-          "address": "Full address"
-        }
-      ]
-    }
-  ],
-  "summary": "Short summary or tips for the trip"
+  "tripName": "string",
+  "hotels": [{ "name": "string", "rating": "string", "priceRange": "string", "address": "string" }],
+  "days": [{
+    "day": number,
+    "activities": [{ "name": "string", "description": "short description", "rating": "string", "location": "string", "time": "9:00 AM - 11:00 AM", "timeToTravel": "string" }],
+    "restaurants": [{ "name": "string", "cuisine": "string", "rating": "string", "address": "string" }]
+  }],
+  "summary": "string"
 }
 
-Rules:
-1. Every activity MUST have "time" and "timeToTravel"
-2. Include 2-3 restaurants and 3 activities per day
-3. NEVER include comments, placeholders like "// ...", or extra text. Output RAW JSON only.
-4. All hotel prices MUST be in Indian Rupees (₹).
+STRICT CODE RULES:
+1. DAY MUST BE AN INTEGER (1, 2, etc).
+2. GENERATE ALL ${noOfDays} DAYS.
+3. INCLUDE EXACTLY 3 HOTELS in root array.
+4. INCLUDE EXACTLY 3 ACTIVITIES AND 2 RESTAURANTS PER DAY.
+5. EVERY activity MUST have a specific "time" range (e.g., 10:00 AM - 12:00 PM).
+6. SCHEDULE items in chronological order: Morning, Afternoon, Evening.
+7. Keep descriptions VERY short (1 sentence).
+8. OUTPUT RAW JSON OBJECT ONLY. NO IMAGEURL.
 `;
