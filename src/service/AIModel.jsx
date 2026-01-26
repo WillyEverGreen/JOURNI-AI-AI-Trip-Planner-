@@ -5,18 +5,11 @@ import { generateTripPrompt } from "@/constants/prompts";
 // Call Qubrid AI (NVIDIA Nemotron) with given prompt
 // Call Qubrid AI (Mistral 7B) with given prompt
 export async function callGemini(prompt) {
-  const API_KEY = import.meta.env.VITE_QUBRID_API_KEY; 
-  if (!API_KEY) {
-      console.error("VITE_QUBRID_API_KEY is missing! Please set it in .env.local");
-      return null;
-  }
-
   try {
-    const response = await fetch("https://platform.qubrid.com/api/v1/qubridai/chat/completions", {
+    const response = await fetch("http://localhost:3001/api/chat", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${API_KEY}`
         },
         body: JSON.stringify({
             model: "mistralai/Mistral-7B-Instruct-v0.3",
@@ -31,73 +24,21 @@ export async function callGemini(prompt) {
                 }
             ],
             temperature: 0.7,
-            max_tokens: 4096, // Mistral 7B context window
-            stream: true // Explicitly handle as stream since API forces it
+            max_tokens: 4096,
+            stream: true 
         })
     });
 
     if (!response.ok) {
         const errText = await response.text();
-        console.error("Qubrid API Error:", response.status, errText);
+        console.error("Backend Proxy Error:", response.status, errText);
         return null;
     }
 
-    // Handle Streaming Response (API returns SSE events)
-    const reader = response.body.getReader();
-    const decoder = new TextDecoder("utf-8");
-    let fullText = "";
-    let buffer = "";
-
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-
-      const chunkText = decoder.decode(value, { stream: true });
-      buffer += chunkText;
-
-      const lines = buffer.split(/\r?\n/);
-      // Keep successful lines, put the last partial line back in buffer
-      buffer = lines.pop() || ""; 
-
-      for (const line of lines) {
-         const trimmedLine = line.trim();
-         // Check for SSE data
-         if (trimmedLine.startsWith("data:")) {
-             const jsonStr = trimmedLine.replace("data:", "").trim();
-             if (jsonStr === "[DONE]") continue;
-
-             try {
-                 const chunk = JSON.parse(jsonStr);
-                 // Extract content from delta (standard streaming) or message (sometimes full)
-                 const content = 
-                    chunk.choices?.[0]?.delta?.content || 
-                    chunk.choices?.[0]?.message?.content || 
-                    chunk.choices?.[0]?.text || 
-                    chunk.content || 
-                    "";
-                 
-                 if (content) fullText += content;
-             } catch (e) {
-                 // console.warn("Error parsing chunk", e);
-             }
-         }
-      }
-    }
+    const data = await response.json();
+    const fullText = data.content;
     
-    // Process any remaining buffer
-    buffer += decoder.decode(); 
-    if (buffer.trim().startsWith("data:")) {
-         try {
-             const jsonStr = buffer.trim().replace("data:", "").trim();
-             if (jsonStr !== "[DONE]") {
-                const chunk = JSON.parse(jsonStr);
-                const content = chunk.choices?.[0]?.delta?.content || "";
-                if (content) fullText += content;
-             }
-         } catch(e) {}
-    }
-    
-    console.log("Qubrid Full Text (Streamed):", fullText);
+    console.log("Qubrid (via Proxy) Full Text:", fullText);
 
     // Remove triple backticks ```json if present
     const jsonMatch = fullText.match(/```(?:json)?\s*([\s\S]*?)```/);
@@ -110,11 +51,10 @@ export async function callGemini(prompt) {
       return parsed;
     } catch (err) {
       console.warn("AI returned non-JSON text", err);
-      // Attempt to return raw text if parsing fails, but UI might break
       return jsonText; 
     }
   } catch (err) {
-    console.error("Error calling Qubrid API:", err);
+    console.error("Error calling Backend Proxy:", err);
     return null;
   }
 }

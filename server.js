@@ -15,6 +15,7 @@ if (fs.existsSync(localEnv)) {
 
 const app = express();
 app.use(cors());
+app.use(express.json());
 
 const GOOGLE_API_KEY = process.env.GOOGLE_MAPS_API_KEY || process.env.VITE_GOOGLE_MAPS_API_KEY;
 if (!GOOGLE_API_KEY) console.warn("GOOGLE_MAPS_API_KEY not set in environment");
@@ -74,6 +75,94 @@ app.get("/api/place", async (req, res) => {
   } catch (e) {
     console.error("Error in /api/place", e);
     res.status(500).json({ error: "server error" });
+  }
+});
+
+// Qubrid AI Proxy
+app.post("/api/chat", async (req, res) => {
+  const API_KEY = process.env.VITE_QUBRID_API_KEY;
+  if (!API_KEY) {
+    return res.status(500).json({ error: "VITE_QUBRID_API_KEY not set in environment" });
+  }
+
+  try {
+    const url = "https://platform.qubrid.com/api/v1/qubridai/chat/completions";
+    const options = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${API_KEY}`
+      },
+      body: JSON.stringify(req.body)
+    };
+
+    const response = await (globalFetch
+      ? globalFetch(url, options)
+      : (await import("node-fetch")).default(url, options));
+
+    if (!response.ok) {
+        const errText = await response.text();
+        console.error("Qubrid API Error (Backend):", response.status, errText);
+        return res.status(response.status).json({ error: errText });
+    }
+
+    // Handle Streaming Response and aggregate for the frontend
+    // Alternatively, we could stream it back to the frontend, 
+    // but aggregating is simpler for the current frontend logic.
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder("utf-8");
+    let fullText = "";
+    let buffer = "";
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      const chunkText = decoder.decode(value, { stream: true });
+      buffer += chunkText;
+
+      const lines = buffer.split(/\r?\n/);
+      buffer = lines.pop() || ""; 
+
+      for (const line of lines) {
+         const trimmedLine = line.trim();
+         if (trimmedLine.startsWith("data:")) {
+             const jsonStr = trimmedLine.replace("data:", "").trim();
+             if (jsonStr === "[DONE]") continue;
+
+             try {
+                 const chunk = JSON.parse(jsonStr);
+                 const content = 
+                    chunk.choices?.[0]?.delta?.content || 
+                    chunk.choices?.[0]?.message?.content || 
+                    chunk.choices?.[0]?.text || 
+                    chunk.content || 
+                    "";
+                 
+                 if (content) fullText += content;
+             } catch (e) {}
+         }
+      }
+    }
+    
+    // Process remaining buffer
+    buffer += decoder.decode(); 
+    if (buffer.trim().startsWith("data:")) {
+         try {
+             const jsonStr = buffer.trim().replace("data:", "").trim();
+             if (jsonStr !== "[DONE]") {
+                const chunk = JSON.parse(jsonStr);
+                const content = chunk.choices?.[0]?.delta?.content || "";
+                if (content) fullText += content;
+             }
+         } catch(e) {}
+    }
+
+    res.json({ content: fullText });
+
+  } catch (error) {
+    console.error("Proxy error:", error);
+    res.status(500).json({ error: "Backend proxy error" });
   }
 });
 
