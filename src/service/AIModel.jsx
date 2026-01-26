@@ -121,7 +121,7 @@ export async function generateTrip(prompt) {
         ],
         temperature: 0.7,
         max_tokens: 5000,
-        stream: true,
+        stream: false,
       }),
     });
 

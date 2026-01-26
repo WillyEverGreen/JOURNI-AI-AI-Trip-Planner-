@@ -43,15 +43,9 @@ export default async function handler(req, res) {
         return res.status(response.status).json({ error: errText });
     }
 
-    // Since this is a serverless function, we aggregate the stream
-    // and return the final JSON. 
-    // Note: node-fetch (v2/v3) on Vercel sometimes yields different body types.
-    // For standard streaming in Vercel Node.js, we can read chunks.
-    
-    let fullText = "";
-    
-    // Check if the response body is streamable
-    if (response.body && typeof response.body.on === 'function') {
+    // Check if the response is streaming
+    const contentType = response.headers.get("content-type") || "";
+    if (contentType.includes("text/event-stream") && response.body && typeof response.body.on === 'function') {
         // Node-style stream
         await new Promise((resolve, reject) => {
             let buffer = "";
@@ -70,6 +64,7 @@ export default async function handler(req, res) {
                             const content = 
                                 parsed.choices?.[0]?.delta?.content || 
                                 parsed.choices?.[0]?.message?.content || 
+                                parsed.choices?.[0]?.text || 
                                 parsed.content || "";
                             if (content) fullText += content;
                         } catch (e) {}
@@ -77,15 +72,14 @@ export default async function handler(req, res) {
                 }
             });
             response.body.on('end', () => {
-                // Final buffer check not needed for SSE [DONE] usually
                 resolve();
             });
             response.body.on('error', reject);
         });
     } else {
-        // Fallback for non-streaming response
+        // Fallback or standard JSON response
         const data = await response.json();
-        fullText = data.choices?.[0]?.message?.content || data.content || "";
+        fullText = data.content || data.choices?.[0]?.message?.content || "";
     }
 
     return res.json({ content: fullText });

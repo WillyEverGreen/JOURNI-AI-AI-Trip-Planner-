@@ -106,60 +106,50 @@ app.post("/api/chat", async (req, res) => {
         return res.status(response.status).json({ error: errText });
     }
 
-    // Handle Streaming Response and aggregate for the frontend
-    // Alternatively, we could stream it back to the frontend, 
-    // but aggregating is simpler for the current frontend logic.
-    const reader = response.body.getReader();
-    const decoder = new TextDecoder("utf-8");
-    let fullText = "";
-    let buffer = "";
+    // Check if the response is streaming
+    const contentType = response.headers.get("content-type") || "";
+    if (contentType.includes("text/event-stream") && response.body.getReader) {
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder("utf-8");
+        let fullText = "";
+        let buffer = "";
 
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
 
-      const chunkText = decoder.decode(value, { stream: true });
-      buffer += chunkText;
+            const chunkText = decoder.decode(value, { stream: true });
+            buffer += chunkText;
 
-      const lines = buffer.split(/\r?\n/);
-      buffer = lines.pop() || ""; 
+            const lines = buffer.split(/\r?\n/);
+            buffer = lines.pop() || ""; 
 
-      for (const line of lines) {
-         const trimmedLine = line.trim();
-         if (trimmedLine.startsWith("data:")) {
-             const jsonStr = trimmedLine.replace("data:", "").trim();
-             if (jsonStr === "[DONE]") continue;
+            for (const line of lines) {
+                const trimmedLine = line.trim();
+                if (trimmedLine.startsWith("data:")) {
+                    const jsonStr = trimmedLine.replace("data:", "").trim();
+                    if (jsonStr === "[DONE]") continue;
 
-             try {
-                 const chunk = JSON.parse(jsonStr);
-                 const content = 
-                    chunk.choices?.[0]?.delta?.content || 
-                    chunk.choices?.[0]?.message?.content || 
-                    chunk.choices?.[0]?.text || 
-                    chunk.content || 
-                    "";
-                 
-                 if (content) fullText += content;
-             } catch (e) {}
-         }
-      }
+                    try {
+                        const chunk = JSON.parse(jsonStr);
+                        const content = 
+                            chunk.choices?.[0]?.delta?.content || 
+                            chunk.choices?.[0]?.message?.content || 
+                            chunk.choices?.[0]?.text || 
+                            chunk.content || 
+                            "";
+                        if (content) fullText += content;
+                    } catch (e) {}
+                }
+            }
+        }
+        return res.json({ content: fullText });
+    } else {
+        // Standard JSON handling
+        const data = await response.json();
+        const content = data.content || data.choices?.[0]?.message?.content || "";
+        return res.json({ content: content });
     }
-    
-    // Process remaining buffer
-    buffer += decoder.decode(); 
-    if (buffer.trim().startsWith("data:")) {
-         try {
-             const jsonStr = buffer.trim().replace("data:", "").trim();
-             if (jsonStr !== "[DONE]") {
-                const chunk = JSON.parse(jsonStr);
-                const content = chunk.choices?.[0]?.delta?.content || "";
-                if (content) fullText += content;
-             }
-         } catch(e) {}
-    }
-
-    res.json({ content: fullText });
-
   } catch (error) {
     console.error("Proxy error:", error);
     res.status(500).json({ error: "Backend proxy error" });
