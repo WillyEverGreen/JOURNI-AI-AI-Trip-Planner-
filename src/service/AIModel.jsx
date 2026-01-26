@@ -6,7 +6,7 @@ import { generateTripPrompt } from "@/constants/prompts";
 // Call Qubrid AI (Mistral 7B) with given prompt
 export async function callGemini(prompt) {
   try {
-    const response = await fetch("http://localhost:3001/api/chat", {
+    const response = await fetch("/api/chat", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
