@@ -4,6 +4,27 @@ import { generateTripPrompt } from "@/constants/prompts";
 // Call Grok API (xAI) with given prompt
 // Call Qubrid AI (NVIDIA Nemotron) with given prompt
 // Call Qubrid AI (Mistral 7B) with given prompt
+// Helper to repair truncated JSON
+const repairJson = (text) => {
+    let json = text.trim();
+    
+    // Check if it starts with { but doesn't end with }
+    if (json.startsWith("{") && !json.endsWith("}")) {
+        // Find deepest open structures
+        const stack = [];
+        for (let i = 0; i < json.length; i++) {
+            if (json[i] === "{") stack.push("}");
+            else if (json[i] === "[") stack.push("]");
+            else if (json[i] === "}") stack.pop();
+            else if (json[i] === "]") stack.pop();
+        }
+        while (stack.length > 0) {
+            json += stack.pop();
+        }
+    }
+    return json;
+};
+
 export async function callGemini(prompt) {
   try {
     const response = await fetch("/api/chat", {
@@ -36,22 +57,28 @@ export async function callGemini(prompt) {
     }
 
     const data = await response.json();
-    const fullText = data.content;
+    const fullText = (data.content || "").trim();
     
     console.log("Qubrid (via Proxy) Full Text:", fullText);
 
-    // Remove triple backticks ```json if present
+    // Remove triple backticks if present
     const jsonMatch = fullText.match(/```(?:json)?\s*([\s\S]*?)```/);
-    const jsonText = jsonMatch ? jsonMatch[1].trim() : fullText.trim();
+    let jsonText = jsonMatch ? jsonMatch[1].trim() : fullText.trim();
     
-    // Validate final JSON
+    // Robust parsing
     try {
-      const parsed = JSON.parse(jsonText);
-      console.log("Parsed trip data:", parsed);
-      return parsed;
+      return JSON.parse(jsonText);
     } catch (err) {
-      console.warn("AI returned non-JSON text", err);
-      return jsonText; 
+      console.warn("Initial JSON parse failed, attempting repair...", err);
+      try {
+        const repaired = repairJson(jsonText);
+        return JSON.parse(repaired);
+      } catch (repairErr) {
+        console.error("JSON repair failed", repairErr);
+        // Last resort: if it's a string that looks like JSON, return it, 
+        // but the UI likely expects an object.
+        return null; 
+      }
     }
   } catch (err) {
     console.error("Error calling Backend Proxy:", err);
