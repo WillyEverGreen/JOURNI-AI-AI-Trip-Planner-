@@ -4,7 +4,7 @@ import { SelectBudget, SelectTravelerList } from "@/constants/options";
 import { Button } from "@/components/ui/button";
 import toast from "react-hot-toast";
 import { Toaster } from "react-hot-toast";
-import { callGemini, getTripPrompt } from "@/service/AIModel";
+import { generateTrip, getTripPrompt } from "@/service/AIModel";
 import { useAuth0 } from "@auth0/auth0-react";
 import { db } from "@/service/firebase";
 
@@ -100,7 +100,7 @@ function CreateTrip() {
 
     try {
       const prompt = getTripPrompt(formData);
-      const tripText = await callGemini(prompt);
+      const tripText = await generateTrip(prompt);
 
       let tripData = tripText;
       if (!tripData) {

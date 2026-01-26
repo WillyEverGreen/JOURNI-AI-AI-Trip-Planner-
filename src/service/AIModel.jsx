@@ -4,13 +4,28 @@ import { generateTripPrompt } from "@/constants/prompts";
 // Call Grok API (xAI) with given prompt
 // Call Qubrid AI (NVIDIA Nemotron) with given prompt
 // Call Qubrid AI (Mistral 7B) with given prompt
-// Helper to repair truncated JSON
+// Helper to repair truncated or commented JSON
 const repairJson = (text) => {
     let json = text.trim();
     
+    // Remove potential markdown blocks
+    json = json.replace(/```(?:json)?/g, "").replace(/```/g, "");
+
+    // Remove single line comments that might be at the end or inside
+    json = json.split("\n").map(line => {
+      const commentIndex = line.indexOf("//");
+      if (commentIndex !== -1) {
+        // Only strip if not inside a string (naive check)
+        const quoteBasis = line.substring(0, commentIndex).match(/"/g);
+        if (!quoteBasis || quoteBasis.length % 2 === 0) {
+          return line.substring(0, commentIndex).trim();
+        }
+      }
+      return line;
+    }).join("\n").trim();
+
     // Check if it starts with { but doesn't end with }
     if (json.startsWith("{") && !json.endsWith("}")) {
-        // Find deepest open structures
         const stack = [];
         for (let i = 0; i < json.length; i++) {
             if (json[i] === "{") stack.push("}");
@@ -25,7 +40,10 @@ const repairJson = (text) => {
     return json;
 };
 
-export async function callGemini(prompt) {
+/**
+ * Generates a trip itinerary using the Qubrid AI backend proxy.
+ */
+export async function generateTrip(prompt) {
   try {
     const response = await fetch("/api/chat", {
         method: "POST",
@@ -37,7 +55,7 @@ export async function callGemini(prompt) {
             messages: [
                 {
                     role: "system",
-                    content: "You are an expert AI Trip Planner. Generate detailed travel itineraries in JSON format. IMPORTANT: Output ONLY standard JSON. Do not output reasoning, thinking, or markdown code blocks. Just valid JSON."
+                    content: "You are an expert AI Trip Planner. Generate detailed travel itineraries in JSON format. IMPORTANT: Output ONLY standard JSON. NEVER include comments, notes, or markdown. Output must be raw JSON only."
                 },
                 {
                     role: "user",
@@ -61,22 +79,23 @@ export async function callGemini(prompt) {
     
     console.log("Qubrid (via Proxy) Full Text:", fullText);
 
-    // Remove triple backticks if present
-    const jsonMatch = fullText.match(/```(?:json)?\s*([\s\S]*?)```/);
-    let jsonText = jsonMatch ? jsonMatch[1].trim() : fullText.trim();
-    
     // Robust parsing
     try {
-      return JSON.parse(jsonText);
+      // Try to find the first '{' and last '}' to strip AI chatter
+      const start = fullText.indexOf("{");
+      const end = fullText.lastIndexOf("}");
+      if (start !== -1 && end !== -1 && end > start) {
+          const stripped = fullText.substring(start, end + 1);
+          return JSON.parse(stripped);
+      }
+      return JSON.parse(fullText);
     } catch (err) {
       console.warn("Initial JSON parse failed, attempting repair...", err);
       try {
-        const repaired = repairJson(jsonText);
+        const repaired = repairJson(fullText);
         return JSON.parse(repaired);
       } catch (repairErr) {
         console.error("JSON repair failed", repairErr);
-        // Last resort: if it's a string that looks like JSON, return it, 
-        // but the UI likely expects an object.
         return null; 
       }
     }
