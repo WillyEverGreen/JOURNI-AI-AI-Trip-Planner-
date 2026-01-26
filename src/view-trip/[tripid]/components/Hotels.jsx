@@ -4,9 +4,14 @@ import PlaceImage from "./PlaceImage";
 function Hotels({ trip }) {
   // Deduplicate by normalized name + address to avoid repeated entries across days
   const uniqueHotels = React.useMemo(() => {
-    // Collect all hotels from all days using flatMap inside useMemo
-    const allHotels =
+    // 1. Check root-level hotels first (new structure)
+    const rootHotels = trip?.tripPlan?.hotels || [];
+    
+    // 2. Fallback to per-day hotels (old structure)
+    const dailyHotels =
       trip?.tripPlan?.days?.flatMap((day) => day.hotels || []) || [];
+
+    const allHotels = [...rootHotels, ...dailyHotels];
 
     const map = new Map();
     for (const h of allHotels) {

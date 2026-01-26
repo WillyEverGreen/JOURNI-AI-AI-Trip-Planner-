@@ -70,6 +70,10 @@ const repairJson = (text) => {
  */
 export async function generateTrip(prompt) {
   try {
+    // Dynamically adjust max tokens for longer trips
+    const requestedDays = prompt.match(/(\d+)-day/)?.[1] || 1;
+    const calculatedMaxTokens = Math.min(8192, (requestedDays * 800) + 1000);
+
     const response = await fetch("/api/chat", {
       method: "POST",
       headers: {
@@ -89,7 +93,7 @@ export async function generateTrip(prompt) {
           },
         ],
         temperature: 0.7,
-        max_tokens: 4096,
+        max_tokens: calculatedMaxTokens,
         stream: true,
       }),
     });
