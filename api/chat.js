@@ -19,13 +19,14 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const API_KEY = process.env.VITE_QUBRID_API_KEY;
+  const API_KEY = process.env.VITE_NVIDIA_API_KEY;
   if (!API_KEY) {
-    return res.status(500).json({ error: "VITE_QUBRID_API_KEY not set in environment" });
+    return res.status(500).json({ error: "VITE_NVIDIA_API_KEY not set in environment" });
   }
 
   try {
-    const url = "https://platform.qubrid.com/api/v1/qubridai/chat/completions";
+    let fullText = "";
+    const url = "https://integrate.api.nvidia.com/v1/chat/completions";
     const options = {
       method: "POST",
       headers: {
@@ -39,7 +40,7 @@ export default async function handler(req, res) {
 
     if (!response.ok) {
         const errText = await response.text();
-        console.error("Qubrid API Error (Production):", response.status, errText);
+        console.error("NVIDIA API Error (Production):", response.status, errText);
         return res.status(response.status).json({ error: errText });
     }
 

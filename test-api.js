@@ -53,7 +53,7 @@ STRICT CODE RULES:
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "mistralai/Mistral-7B-Instruct-v0.3",
+        model: "meta/llama-3.1-8b-instruct",
         messages: [{ role: "user", content: prompt }],
         max_tokens: 5000,
         stream: true

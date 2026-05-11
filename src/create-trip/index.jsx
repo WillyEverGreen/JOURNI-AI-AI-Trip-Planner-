@@ -72,10 +72,9 @@ function CreateTrip() {
     const { destination, noOfDays, budget, travelers } = formData;
 
     if (isAuthenticated) {
-      console.log(user);
+      // User is authenticated
     }
     if (!isAuthenticated) {
-      console.log("User is not logged in:");
 
       loginWithRedirect(); //redirects user to login page
       return;
@@ -94,7 +93,6 @@ function CreateTrip() {
     }
 
     const toastId = toast.loading("Generating your trip plan...🎃");
-    console.log("Generating trip with data:", formData);
 
     setLoading(true);
 
@@ -112,8 +110,6 @@ function CreateTrip() {
       setTripPlan(tripData);
 
       saveTripToFirebase(tripData); //will save all data to firebase
-      console.log(tripData);
-
       toast.success("Trip generated successfully! 🥳", { id: toastId });
     } catch (err) {
       console.error(err);

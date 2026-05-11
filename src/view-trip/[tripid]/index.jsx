@@ -32,10 +32,8 @@ function Viewtrip() {
       const docSnap = await getDoc(docRef);
 
       if (docSnap.exists()) {
-        console.log("Document: ", docSnap.data());
         setTrip(docSnap.data());
       } else {
-        console.log("No document was found");
         toast.error("No trip found");
       }
     };

@@ -4,11 +4,10 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 
-// Load environment: prefer .env.local for local development, otherwise fall back to default .env
-const localEnv = ".env.local";
 import fs from "fs";
-if (fs.existsSync(localEnv)) {
-  dotenv.config({ path: localEnv });
+// Load .env.local if it exists, otherwise default to .env/process.env
+if (fs.existsSync(".env.local")) {
+  dotenv.config({ path: ".env.local" });
 } else {
   dotenv.config();
 }
@@ -17,10 +16,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const GOOGLE_API_KEY = process.env.GOOGLE_MAPS_API_KEY || process.env.VITE_GOOGLE_MAPS_API_KEY;
-if (!GOOGLE_API_KEY) console.warn("GOOGLE_MAPS_API_KEY not set in environment");
-
-// Prefer global fetch
+// Prefer global fetch (available in Node 18+)
 const globalFetch = globalThis.fetch;
 
 // Scrape Google Images as requested by user (fallback for API key issues)
@@ -78,15 +74,15 @@ app.get("/api/place", async (req, res) => {
   }
 });
 
-// Qubrid AI Proxy
+// NVIDIA AI Proxy
 app.post("/api/chat", async (req, res) => {
-  const API_KEY = process.env.VITE_QUBRID_API_KEY;
+  const API_KEY = process.env.VITE_NVIDIA_API_KEY;
   if (!API_KEY) {
-    return res.status(500).json({ error: "VITE_QUBRID_API_KEY not set in environment" });
+    return res.status(500).json({ error: "VITE_NVIDIA_API_KEY not set in environment" });
   }
 
   try {
-    const url = "https://platform.qubrid.com/api/v1/qubridai/chat/completions";
+    const url = "https://integrate.api.nvidia.com/v1/chat/completions";
     const options = {
       method: "POST",
       headers: {
@@ -156,5 +152,5 @@ app.post("/api/chat", async (req, res) => {
   }
 });
 
-const port = process.env.PORT || 3001;
+const port = process.env.PORT || 3002;
 app.listen(port, () => console.log(`Places proxy server listening on ${port}`));

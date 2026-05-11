@@ -1,11 +1,9 @@
-// src/components/AIModel.jsx
+// src/service/AIModel.jsx
 import { generateTripPrompt } from "@/constants/prompts";
 
-// Call Grok API (xAI) with given prompt
-// Call Qubrid AI (NVIDIA Nemotron) with given prompt
-// Call Qubrid AI (Mistral 7B) with given prompt
-// Helper to repair truncated or commented JSON
-// Helper to repair truncated or malformed JSON
+/**
+ * Repairs truncated or malformed JSON responses from AI models.
+ */
 const repairJson = (text) => {
   let json = text.trim();
 
@@ -107,7 +105,7 @@ export async function generateTrip(prompt) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "mistralai/Mistral-7B-Instruct-v0.3",
+        model: "meta/llama-3.1-8b-instruct",
         messages: [
           {
             role: "system",
@@ -127,14 +125,14 @@ export async function generateTrip(prompt) {
 
     if (!response.ok) {
       const errText = await response.text();
-      console.error("Backend Proxy Error:", response.status, errText);
+      console.error(`Backend Proxy Error [${response.status}]:`, errText);
       return null;
     }
 
     const data = await response.json();
     const fullText = (data.content || "").trim();
 
-    console.log("Qubrid (via Proxy) Full Text:", fullText);
+    console.log("NVIDIA (via Proxy) Full Text:", fullText);
 
     let parsed = null;
     // Robust parsing strategy:
